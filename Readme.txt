@@ -5,3 +5,6 @@ if local repo does not exist, do git clone first
 2. git commit -am "comment"
 3. git push
 
+When you want to pull the code from repo:
+git pull
+
