@@ -1,16 +1,30 @@
 
+global mapping;
+global pca_data;
+global num;
+global dim;
+global data;
+
+%choose folder of images
 folder ='D:\MAP\77.2.628_MatronC02R02'; 
 I = dir(fullfile(folder,'*.tif'));
-iter = size(I);
 
+%find total number of images in the folder
+num_img = size(I);
+
+%find image size
 dim_file = fullfile(folder,I(1).name);
 img_1 = imread(dim_file);
 unraveled = img_1(:);
 x = size(unraveled);
-%data = zeros(x(1),iter(1));
-num = 7;
-data = zeros(x(1),num);
 
+%choose number of images to reduce
+num = 8;
+
+%initialize data matrix
+data = zeros(x(1),num); 
+
+%iterate through the folder to add data into the matrix
 for k = 1:num
     filename = fullfile(folder,I(k).name);
     img = imread(filename); 
@@ -20,9 +34,17 @@ for k = 1:num
     data(:, k) = column;
 end
 
-[pca_data, mapping] = compute_mapping(data, 'PCA', 4);
-pc = pca_data(:, 1);
-pc = reshape(pc, size(img_1));
-% pc16 = uint16(pc - 1);
-% pc16 = bitshift(pc16,4);
-imshow(pc)
+%preform PCA and choose output folder
+dim = num-1;
+tic
+[pca_data, mapping] = compute_mapping(data, 'PCA', dim);
+output_folder = 'C:\Users\Student\Desktop\trash';
+
+%reshape images and save them
+for j = 1:dim
+    pc = pca_data(:, j);
+    pc = reshape(pc, size(img_1));
+    F = strcat('pc_', num2str(j), '.tif');
+    imwrite(pc, fullfile(output_folder, F));
+end
+toc
